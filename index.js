@@ -1,4 +1,10 @@
-var Twit = require('twit')
+var Twit = require('twit');
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.set("view engine", "ejs");
  
 var T = new Twit({
   consumer_key:         'vMrbbkocSVSteFsJzjbSwtnIX',
@@ -7,20 +13,50 @@ var T = new Twit({
   access_token_secret:  '4BBsGzqKnYXNPhCsDkRlvD4MPWuXPau8PSCFKc2yfy4jG',
 })
 
-let user_name = 'kananrengaraju';
 
-T.get('statuses/user_timeline', { screen_name: user_name },   (err, data, response) => {	
-	if(err === undefined){
-		data.forEach( datum => {
-			console.log('Text: \n' + datum['text']);
-			if(datum['retweeted_status'] === undefined){
-				console.log('Favorites: ' + datum['favorite_count']);
-				console.log('Retweets: ' + datum['retweet_count']);
-			}
-			console.log('\n');
-		})
-	} else {
-		console.log("USER DOESN'T EXIST")
-	}
+var user_name = '';
+
+app.get('/', (req, res) => {
+	res.render('home');
+});
+
+app.post('/', (req,res) => {
+	// first(req, res, second);
+	user_name = req.body.twitter_user
+	res.redirect('/tweets');
+});
+
+
+app.get('/tweets', (req,res) => {
+	T.get('statuses/user_timeline', { screen_name: user_name },   (err, data, response) => {	
+		var tweetArray = [];
+		if(err === undefined){
+			data.forEach((datum) => {
+				var obj = {
+					text: datum['text'],
+					favorites: datum['favorite_count'],
+					retweets: datum['retweet_count']
+				}
+				tweetArray.push(obj);
+			});
+		} 
+		else {
+			console.log("USER DOESN'T EXIST");
+		}
+		res.render('tweets', {tweetArray: tweetArray});
+	});
+});
+
+
+
+
+app.listen(3000, () => {
+	console.log('port 3000')
 })
+
+
+
+
+		
+
 

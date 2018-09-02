@@ -1,0 +1,17 @@
+
+<form action="/" method="post">
+	<input type="text" name="twitter_user">
+	<input type="submit">
+</form>
+
+<% tweetArray.forEach((tweet) => { %>
+<ul>
+	<li> 
+		<ul>
+			<li><%= tweet['text'] %> </li>
+			<li><%= tweet['favorites'] %> </li>
+			<li><%= tweet['retweets'] %> </li>
+		</ul>
+	</li>
+</ul>
+<% }); %>
