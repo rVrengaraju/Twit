@@ -14,6 +14,16 @@ var T = new Twit({
 })
 
 
+const whiteSpace = str => {
+	if (/\s/.test(str)) {
+   		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+
 var user_name = '';
 
 app.get('/', (req, res) => {
@@ -21,16 +31,18 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', (req,res) => {
-	// first(req, res, second);
 	user_name = req.body.twitter_user
 	res.redirect('/tweets');
 });
 
-
 app.get('/tweets', (req,res) => {
-	T.get('statuses/user_timeline', { screen_name: user_name },   (err, data, response) => {	
-		var tweetArray = [];
-		if(err === undefined){
+	let space = whiteSpace(user_name);
+	T.get('statuses/user_timeline', { screen_name: user_name },   (err, data, response) => {
+		if(space === true || user_name === ""){
+			res.render('error');
+		}	
+		else if(err === undefined){
+			var tweetArray = [];
 			data.forEach((datum) => {
 				var obj = {
 					text: datum['text'],
@@ -39,24 +51,22 @@ app.get('/tweets', (req,res) => {
 				}
 				tweetArray.push(obj);
 			});
+			res.render('tweets', {tweetArray: tweetArray});
 		} 
 		else {
-			console.log("USER DOESN'T EXIST");
+			res.render('error');
 		}
-		res.render('tweets', {tweetArray: tweetArray});
 	});
 });
 
 
 
+app.get('/*', (req, res) => {
+	res.redirect('/');
+});
+
+
 
 app.listen(3000, () => {
-	console.log('port 3000')
+	console.log('http://localhost:3000/')
 })
-
-
-
-
-		
-
-
