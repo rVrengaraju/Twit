@@ -18,27 +18,29 @@ const whiteSpace = str => {
 	if (/\s/.test(str)) {
    		return true;
 	}
+	if (0 === str.length) {
+		return true;
+	}
 	else{
 		return false;
 	}
 }
 
 
-var user_name = '';
-
 app.get('/', (req, res) => {
 	res.render('home');
 });
 
 app.post('/', (req,res) => {
-	user_name = req.body.twitter_user
-	res.redirect('/tweets');
+	var user_name = req.body.twitter_user
+	res.redirect('/' + user_name);
 });
 
-app.get('/tweets', (req,res) => {
+app.get('/:id', (req,res) => {
+	var user_name = req.params.id;
 	let space = whiteSpace(user_name);
 	T.get('statuses/user_timeline', { screen_name: user_name },   (err, data, response) => {
-		if(space === true || user_name === ""){
+		if(space === true){
 			res.render('error');
 		}	
 		else if(err === undefined){
